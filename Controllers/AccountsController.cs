@@ -13,16 +13,19 @@ public class AccountsController : ControllerBase
     private readonly AccountRepository _accountRepository;
     private readonly MovementRepository _movementRepository;
     private readonly MovementApplicationService _movementApplicationService;
+    private readonly AccountSummaryService _accountSummaryService;
 
     public AccountsController(
         AccountRepository accountRepository,
         MovementRepository movementRepository,
-        MovementApplicationService movementApplicationService
+        MovementApplicationService movementApplicationService,
+        AccountSummaryService accountSummaryService
     )
     {
         _accountRepository = accountRepository;
         _movementRepository = movementRepository;
         _movementApplicationService = movementApplicationService;
+        _accountSummaryService = accountSummaryService;
     }
 
     [HttpGet]
@@ -167,5 +170,32 @@ public class AccountsController : ControllerBase
                 result.Message
             )
         );
+    }
+
+    [HttpGet("{accountNumber}/summary")]
+    public async Task<ActionResult<ApiResponse<AccountSummaryResponseDto>>> GetSummary(
+        string accountNumber
+    )
+    {
+        AccountDocument? account =
+            await _accountRepository.GetRawAccountByNumberAsync(accountNumber);
+
+        if (account is null)
+        {
+            return NotFound(ApiResponse<AccountSummaryResponseDto>.Fail(
+                $"Account {accountNumber} was not found."
+            ));
+        }
+
+        List<MovementDocument> movements =
+            await _movementRepository.GetRawMovementsByAccountNumberAsync(accountNumber);
+
+        AccountSummaryResponseDto summary =
+            _accountSummaryService.BuildSummary(account, movements);
+
+        return Ok(ApiResponse<AccountSummaryResponseDto>.Ok(
+            summary,
+            "Account summary retrieved successfully."
+        ));
     }
 }

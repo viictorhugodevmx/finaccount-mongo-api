@@ -29,14 +29,22 @@ public class MovementRepository
         string accountNumber
     )
     {
+        List<MovementDocument> movements =
+            await GetRawMovementsByAccountNumberAsync(accountNumber);
+
+        return movements.Select(MapToResponseDto).ToList();
+    }
+
+    public async Task<List<MovementDocument>> GetRawMovementsByAccountNumberAsync(
+        string accountNumber
+    )
+    {
         string normalizedAccountNumber = accountNumber.Trim().ToUpper();
 
-        List<MovementDocument> movements = await _movementsCollection
+        return await _movementsCollection
             .Find(movement => movement.AccountNumber == normalizedAccountNumber)
             .SortByDescending(movement => movement.CreatedAtUtc)
             .ToListAsync();
-
-        return movements.Select(MapToResponseDto).ToList();
     }
 
     public async Task<MovementResponseDto> CreateMovementAsync(
