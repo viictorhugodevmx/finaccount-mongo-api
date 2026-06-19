@@ -1,4 +1,5 @@
 using FinAccountMongoApi.Dtos;
+using FinAccountMongoApi.Helpers;
 using FinAccountMongoApi.Models;
 using FinAccountMongoApi.Repositories;
 using FinAccountMongoApi.Services;
@@ -155,12 +156,7 @@ public class AccountsController : ControllerBase
 
         if (!result.Success)
         {
-            if (result.Message.Contains("was not found", StringComparison.OrdinalIgnoreCase))
-            {
-                return NotFound(ApiResponse<MovementResponseDto>.Fail(result.Message));
-            }
-
-            return BadRequest(ApiResponse<MovementResponseDto>.Fail(result.Message));
+            return ApiResponseHelper.FromFailedOperation(this, result);
         }
 
         return Created(
