@@ -36,9 +36,7 @@ public class AccountRepository
 
     public async Task<AccountResponseDto?> GetAccountByNumberAsync(string accountNumber)
     {
-        AccountDocument? account = await _accountsCollection
-            .Find(account => account.AccountNumber == accountNumber.ToUpper())
-            .FirstOrDefaultAsync();
+        AccountDocument? account = await GetRawAccountByNumberAsync(accountNumber);
 
         if (account is null)
         {
@@ -46,6 +44,15 @@ public class AccountRepository
         }
 
         return MapToResponseDto(account);
+    }
+
+    public async Task<AccountDocument?> GetRawAccountByNumberAsync(string accountNumber)
+    {
+        string normalizedAccountNumber = accountNumber.Trim().ToUpper();
+
+        return await _accountsCollection
+            .Find(account => account.AccountNumber == normalizedAccountNumber)
+            .FirstOrDefaultAsync();
     }
 
     public async Task<AccountResponseDto?> CreateAccountAsync(CreateAccountRequestDto request)
@@ -103,6 +110,28 @@ public class AccountRepository
         }
 
         return MapToResponseDto(updatedAccount);
+    }
+
+    public async Task UpdateBalanceAsync(
+        string accountNumber,
+        string movementType,
+        decimal amount
+    )
+    {
+        string normalizedAccountNumber = accountNumber.Trim().ToUpper();
+
+        decimal amountToApply = movementType.Equals("Deposit", StringComparison.OrdinalIgnoreCase)
+            ? amount
+            : -amount;
+
+        UpdateDefinition<AccountDocument> update = Builders<AccountDocument>
+            .Update
+            .Inc(account => account.Balance, amountToApply);
+
+        await _accountsCollection.UpdateOneAsync(
+            account => account.AccountNumber == normalizedAccountNumber,
+            update
+        );
     }
 
     private static AccountResponseDto MapToResponseDto(AccountDocument account)

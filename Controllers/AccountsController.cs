@@ -1,5 +1,7 @@
 using FinAccountMongoApi.Dtos;
+using FinAccountMongoApi.Models;
 using FinAccountMongoApi.Repositories;
+using FinAccountMongoApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FinAccountMongoApi.Controllers;
@@ -9,10 +11,18 @@ namespace FinAccountMongoApi.Controllers;
 public class AccountsController : ControllerBase
 {
     private readonly AccountRepository _accountRepository;
+    private readonly MovementRepository _movementRepository;
+    private readonly MovementApplicationService _movementApplicationService;
 
-    public AccountsController(AccountRepository accountRepository)
+    public AccountsController(
+        AccountRepository accountRepository,
+        MovementRepository movementRepository,
+        MovementApplicationService movementApplicationService
+    )
     {
         _accountRepository = accountRepository;
+        _movementRepository = movementRepository;
+        _movementApplicationService = movementApplicationService;
     }
 
     [HttpGet]
@@ -105,5 +115,57 @@ public class AccountsController : ControllerBase
             updatedAccount,
             "Account status updated successfully."
         ));
+    }
+
+    [HttpGet("{accountNumber}/movements")]
+    public async Task<ActionResult<ApiResponse<List<MovementResponseDto>>>> GetMovements(
+        string accountNumber
+    )
+    {
+        AccountResponseDto? account =
+            await _accountRepository.GetAccountByNumberAsync(accountNumber);
+
+        if (account is null)
+        {
+            return NotFound(ApiResponse<List<MovementResponseDto>>.Fail(
+                $"Account {accountNumber} was not found."
+            ));
+        }
+
+        List<MovementResponseDto> movements =
+            await _movementRepository.GetMovementsByAccountNumberAsync(accountNumber);
+
+        return Ok(ApiResponse<List<MovementResponseDto>>.Ok(
+            movements,
+            "Movements retrieved successfully."
+        ));
+    }
+
+    [HttpPost("{accountNumber}/movements")]
+    public async Task<ActionResult<ApiResponse<MovementResponseDto>>> CreateMovement(
+        string accountNumber,
+        [FromBody] CreateMovementRequestDto request
+    )
+    {
+        OperationResult<MovementResponseDto> result =
+            await _movementApplicationService.CreateMovementAsync(accountNumber, request);
+
+        if (!result.Success)
+        {
+            if (result.Message.Contains("was not found", StringComparison.OrdinalIgnoreCase))
+            {
+                return NotFound(ApiResponse<MovementResponseDto>.Fail(result.Message));
+            }
+
+            return BadRequest(ApiResponse<MovementResponseDto>.Fail(result.Message));
+        }
+
+        return Created(
+            $"/api/accounts/{accountNumber}/movements/{result.Data!.Id}",
+            ApiResponse<MovementResponseDto>.Ok(
+                result.Data,
+                result.Message
+            )
+        );
     }
 }
