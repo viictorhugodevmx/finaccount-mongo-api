@@ -1,6 +1,7 @@
 using FinAccountMongoApi.Repositories;
 using FinAccountMongoApi.Services;
 using FinAccountMongoApi.Settings;
+using FinAccountMongoApi.Validators;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ builder.Services.AddScoped<MovementRepository>();
 builder.Services.AddScoped<MovementApplicationService>();
 builder.Services.AddScoped<AccountSummaryService>();
 builder.Services.AddScoped<DashboardService>();
+builder.Services.AddScoped<MovementValidator>();
 
 builder.Services.AddControllers();
 

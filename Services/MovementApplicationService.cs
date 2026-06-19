@@ -1,6 +1,7 @@
 using FinAccountMongoApi.Dtos;
 using FinAccountMongoApi.Models;
 using FinAccountMongoApi.Repositories;
+using FinAccountMongoApi.Validators;
 
 namespace FinAccountMongoApi.Services;
 
@@ -8,14 +9,17 @@ public class MovementApplicationService
 {
     private readonly AccountRepository _accountRepository;
     private readonly MovementRepository _movementRepository;
+    private readonly MovementValidator _movementValidator;
 
     public MovementApplicationService(
         AccountRepository accountRepository,
-        MovementRepository movementRepository
+        MovementRepository movementRepository,
+        MovementValidator movementValidator
     )
     {
         _accountRepository = accountRepository;
         _movementRepository = movementRepository;
+        _movementValidator = movementValidator;
     }
 
     public async Task<OperationResult<MovementResponseDto>> CreateMovementAsync(
@@ -33,34 +37,13 @@ public class MovementApplicationService
             );
         }
 
-        if (!account.IsActive)
+        OperationResult<bool> validationResult =
+            _movementValidator.Validate(account, request);
+
+        if (!validationResult.Success)
         {
             return OperationResult<MovementResponseDto>.Fail(
-                $"Account {accountNumber} is not active."
-            );
-        }
-
-        if (request.Amount <= 0)
-        {
-            return OperationResult<MovementResponseDto>.Fail(
-                "Movement amount must be greater than zero."
-            );
-        }
-
-        bool isDeposit = request.Type.Equals("Deposit", StringComparison.OrdinalIgnoreCase);
-        bool isWithdrawal = request.Type.Equals("Withdrawal", StringComparison.OrdinalIgnoreCase);
-
-        if (!isDeposit && !isWithdrawal)
-        {
-            return OperationResult<MovementResponseDto>.Fail(
-                "Movement type must be Deposit or Withdrawal."
-            );
-        }
-
-        if (isWithdrawal && request.Amount > account.Balance)
-        {
-            return OperationResult<MovementResponseDto>.Fail(
-                "Insufficient funds."
+                validationResult.Message
             );
         }
 
