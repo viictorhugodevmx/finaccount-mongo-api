@@ -1,0 +1,21 @@
+# .NET build output
+bin/
+obj/
+
+# IDE files
+.vs/
+.idea/
+*.user
+*.suo
+
+# Test results / coverage
+TestResults/
+coverage/
+
+# Environment files
+.env
+appsettings.Development.local.json
+
+# OS files
+.DS_Store
+Thumbs.db
