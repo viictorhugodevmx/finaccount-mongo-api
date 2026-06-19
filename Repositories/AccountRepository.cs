@@ -48,6 +48,63 @@ public class AccountRepository
         return MapToResponseDto(account);
     }
 
+    public async Task<AccountResponseDto?> CreateAccountAsync(CreateAccountRequestDto request)
+    {
+        string normalizedAccountNumber = request.AccountNumber.Trim().ToUpper();
+
+        bool alreadyExists = await _accountsCollection
+            .Find(account => account.AccountNumber == normalizedAccountNumber)
+            .AnyAsync();
+
+        if (alreadyExists)
+        {
+            return null;
+        }
+
+        AccountDocument account = new AccountDocument
+        {
+            AccountNumber = normalizedAccountNumber,
+            CustomerName = request.CustomerName.Trim(),
+            Balance = request.InitialBalance,
+            Currency = request.Currency.Trim().ToUpper(),
+            IsActive = true,
+            CreatedAtUtc = DateTime.UtcNow
+        };
+
+        await _accountsCollection.InsertOneAsync(account);
+
+        return MapToResponseDto(account);
+    }
+
+    public async Task<AccountResponseDto?> UpdateAccountStatusAsync(
+        string accountNumber,
+        UpdateAccountStatusRequestDto request
+    )
+    {
+        string normalizedAccountNumber = accountNumber.Trim().ToUpper();
+
+        UpdateDefinition<AccountDocument> update = Builders<AccountDocument>
+            .Update
+            .Set(account => account.IsActive, request.IsActive);
+
+        AccountDocument? updatedAccount = await _accountsCollection
+            .FindOneAndUpdateAsync(
+                account => account.AccountNumber == normalizedAccountNumber,
+                update,
+                new FindOneAndUpdateOptions<AccountDocument>
+                {
+                    ReturnDocument = ReturnDocument.After
+                }
+            );
+
+        if (updatedAccount is null)
+        {
+            return null;
+        }
+
+        return MapToResponseDto(updatedAccount);
+    }
+
     private static AccountResponseDto MapToResponseDto(AccountDocument account)
     {
         return new AccountResponseDto

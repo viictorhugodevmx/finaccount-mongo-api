@@ -55,11 +55,3 @@ mongodb://localhost:27017
 Base de datos:
 
 finaccount_mongo_db
-Metodología
-
-App x paso y listo.
-
-Para avanzar:
-
-finaccount-mongo-api · Paso X listo
-
