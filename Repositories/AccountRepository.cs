@@ -25,11 +25,16 @@ public class AccountRepository
         );
     }
 
-    public async Task<List<AccountResponseDto>> GetAccountsAsync()
+    public async Task<List<AccountDocument>> GetRawAccountsAsync()
     {
-        List<AccountDocument> accounts = await _accountsCollection
+        return await _accountsCollection
             .Find(_ => true)
             .ToListAsync();
+    }
+
+    public async Task<List<AccountResponseDto>> GetAccountsAsync()
+    {
+        List<AccountDocument> accounts = await GetRawAccountsAsync();
 
         return accounts.Select(MapToResponseDto).ToList();
     }

@@ -12,6 +12,7 @@ builder.Services.AddScoped<AccountRepository>();
 builder.Services.AddScoped<MovementRepository>();
 builder.Services.AddScoped<MovementApplicationService>();
 builder.Services.AddScoped<AccountSummaryService>();
+builder.Services.AddScoped<DashboardService>();
 
 builder.Services.AddControllers();
 

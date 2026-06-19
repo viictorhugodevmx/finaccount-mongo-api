@@ -25,6 +25,13 @@ public class MovementRepository
         );
     }
 
+    public async Task<List<MovementDocument>> GetRawMovementsAsync()
+    {
+        return await _movementsCollection
+            .Find(_ => true)
+            .ToListAsync();
+    }
+
     public async Task<List<MovementResponseDto>> GetMovementsByAccountNumberAsync(
         string accountNumber
     )

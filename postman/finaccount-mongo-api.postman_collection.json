@@ -1,8 +1,8 @@
 {
   "info": {
     "name": "finaccount-mongo-api",
-    "_postman_id": "4e5a87aa-6f1f-42f8-9e30-000000000001",
-    "description": "Postman collection for FinAccount Mongo API.",
+    "_postman_id": "4e5a87aa-6f1f-42f8-9e30-000000000008",
+    "description": "Complete Postman collection for FinAccount Mongo API.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -15,6 +15,321 @@
           "raw": "{{baseUrl}}/api/health",
           "host": ["{{baseUrl}}"],
           "path": ["api", "health"]
+        }
+      }
+    },
+    {
+      "name": "Accounts - Get all accounts",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts"]
+        }
+      }
+    },
+    {
+      "name": "Accounts - Get account by number",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-1001",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-1001"]
+        }
+      }
+    },
+    {
+      "name": "Accounts - Get account not found",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-9999",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-9999"]
+        }
+      }
+    },
+    {
+      "name": "Accounts - Create account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"accountNumber\": \"ACC-3001\",\n  \"customerName\": \"Cliente Postman Mongo\",\n  \"initialBalance\": 4200.75,\n  \"currency\": \"MXN\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts"]
+        }
+      }
+    },
+    {
+      "name": "Accounts - Create duplicate account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"accountNumber\": \"ACC-1001\",\n  \"customerName\": \"Cliente Duplicado Mongo\",\n  \"initialBalance\": 1000,\n  \"currency\": \"MXN\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts"]
+        }
+      }
+    },
+    {
+      "name": "Accounts - Create invalid account negative balance",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"accountNumber\": \"ACC-INVALID\",\n  \"customerName\": \"Cliente Balance Negativo\",\n  \"initialBalance\": -100,\n  \"currency\": \"MXN\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts"]
+        }
+      }
+    },
+    {
+      "name": "Accounts - Update account status false",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isActive\": false\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-1001/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-1001", "status"]
+        }
+      }
+    },
+    {
+      "name": "Accounts - Update account status true",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isActive\": true\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-1001/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-1001", "status"]
+        }
+      }
+    },
+    {
+      "name": "Accounts - Update account status not found",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"isActive\": false\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-9999/status",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-9999", "status"]
+        }
+      }
+    },
+    {
+      "name": "Movements - Get account movements",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-1001/movements",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-1001", "movements"]
+        }
+      }
+    },
+    {
+      "name": "Movements - Create deposit",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"Deposit\",\n  \"amount\": 1000,\n  \"description\": \"Postman deposit test\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-1001/movements",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-1001", "movements"]
+        }
+      }
+    },
+    {
+      "name": "Movements - Create withdrawal",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"Withdrawal\",\n  \"amount\": 500,\n  \"description\": \"Postman withdrawal test\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-1001/movements",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-1001", "movements"]
+        }
+      }
+    },
+    {
+      "name": "Movements - Create invalid type",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"InvalidType\",\n  \"amount\": 1000,\n  \"description\": \"Invalid movement type\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-1001/movements",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-1001", "movements"]
+        }
+      }
+    },
+    {
+      "name": "Movements - Create insufficient funds",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"Withdrawal\",\n  \"amount\": 9999999,\n  \"description\": \"Insufficient funds test\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-1001/movements",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-1001", "movements"]
+        }
+      }
+    },
+    {
+      "name": "Movements - Create movement account not found",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"Deposit\",\n  \"amount\": 1000,\n  \"description\": \"Account not found movement test\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-9999/movements",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-9999", "movements"]
+        }
+      }
+    },
+    {
+      "name": "Summary - Get account summary",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-1001/summary",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-1001", "summary"]
+        }
+      }
+    },
+    {
+      "name": "Summary - Get account summary not found",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/accounts/ACC-9999/summary",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "accounts", "ACC-9999", "summary"]
+        }
+      }
+    },
+    {
+      "name": "Dashboard - Get global dashboard",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/dashboard",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "dashboard"]
         }
       }
     }
